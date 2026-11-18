@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f9fd" />
+  <meta name="description" content="NVDA Insights Studio — a local-first stock history analytics dashboard by Nazir Ali Khan. Import NVIDIA OHLCV data, analyze prices and export findings." />
+  <title>NVDA Insights Studio · Stock analytics</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#overview" aria-label="NVDA Insights Studio home">
+      <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 23 11 16l5 5 12-13M21 8h7v7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/></svg></span>
+      <span><strong>NVDA<span class="brand-blue">.</span>studio</strong><small>INSIGHTS WORKSPACE</small></span>
+    </a>
+    <div class="sidebar-label">WORKSPACE</div>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="nav-item active" type="button" data-view="overview"><span class="nav-icon">◫</span> Overview</button>
+      <button class="nav-item" type="button" data-view="explorer"><span class="nav-icon">⌁</span> Price explorer</button>
+      <button class="nav-item" type="button" data-view="quality"><span class="nav-icon">◇</span> Dataset doctor</button>
+      <button class="nav-item" type="button" data-view="reports"><span class="nav-icon">▤</span> Reports</button>
+    </nav>
+    <div class="sidebar-label side-second">DATA SOURCE</div>
+    <div class="source-card">
+      <div class="source-title"><span class="source-icon">NV</span><span>NVIDIA Corp.<small>NASDAQ · NVDA</small></span></div>
+      <div class="source-dot"><span class="dot"></span><span id="sidebar-data">Loading historical data</span></div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="mini-info"><span class="mini-avatar">N</span><span><strong>Nazir Ali Khan</strong><small>Developer portfolio project</small></span></div>
+      <a href="https://github.com/nazirreally/nvda-insights-studio" target="_blank" rel="noopener noreferrer" class="github-link">View source on GitHub <span>↗</span></a>
+    </div>
+  </aside>
+  <div class="content-shell">
+    <header class="topbar">
+      <button class="mobile-menu" id="menu-toggle" type="button" aria-label="Toggle menu">☰</button>
+      <div class="breadcrumb">Workspace <span>/</span> <strong id="crumb">Overview</strong></div>
+      <div class="top-actions">
+        <span class="status-pill"><span class="dot"></span><span id="status">Loading CSV</span></span>
+        <label class="btn btn-primary import-label" for="file-input"><span aria-hidden="true">↥</span> Import CSV</label>
+        <input type="file" id="file-input" accept=".csv,text/csv" hidden />
+      </div>
+    </header>
+    <main id="main">
+      <div class="error-banner hidden" id="error-banner" role="alert"></div>
+      <section class="screen active" data-screen="overview">
+        <div class="page-head">
+          <div><div class="eyebrow"><span class="eyebrow-square"></span> MARKET INTELLIGENCE / NVDA</div>
+            <h1>NVIDIA stock <em>intelligence.</em></h1>
+            <p>Explore historical price behavior, risk signals, trading activity and data quality — all in one focused workspace.</p>
+          </div>
+          <div class="asof"><span class="asof-label">DATA AS OF</span><strong id="asof-date">—</strong><span id="data-origin-short">Historical, not live</span></div>
+        </div>
+        <div class="notice"><span class="notice-icon">i</span><span id="dataset-notice">Loading historical dataset…</span></div>
+        <div class="section-header"><h2>Performance overview</h2><div class="period-tabs" aria-label="Historical date range" id="period-tabs">
+          <button data-period="1M">1M</button><button data-period="3M">3M</button><button data-period="6M">6M</button><button data-period="1Y" class="active">1Y</button><button data-period="5Y">5Y</button><button data-period="ALL">ALL</button>
+        </div></div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">Last closing price <span>↗</span></div><div class="kpi-value" id="kpi-price">—</div><div class="kpi-meta" id="meta-price">Selected dataset</div></div>
+          <div class="kpi"><div class="kpi-label">Period return <span>↗</span></div><div class="kpi-value" id="kpi-return">—</div><div class="kpi-meta" id="meta-return">First to last selected price</div></div>
+          <div class="kpi"><div class="kpi-label">Annualized volatility <span>◈</span></div><div class="kpi-value" id="kpi-volatility">—</div><div class="kpi-meta">Daily return SD × √252</div></div>
+          <div class="kpi"><div class="kpi-label">Maximum drawdown <span>↘</span></div><div class="kpi-value" id="kpi-drawdown">—</div><div class="kpi-meta">Within selected window</div></div>
+        </div>
+        <div class="main-grid">
+          <section class="panel price-panel">
+            <div class="panel-head"><div><h3>Price performance</h3><p id="price-subtitle">Close price and moving averages</p></div><div class="chart-legend"><span><i class="legend-dot blue"></i>Price</span><span><i class="legend-dot violet"></i>20-day MA</span><span><i class="legend-dot teal"></i>50-day MA</span></div></div>
+            <div class="chart-wrap" id="price-chart"><div class="chart-empty">Loading chart...</div></div>
+            <div class="chart-foot"><span id="chart-range">—</span><span>Hover to inspect · USD</span></div>
+          </section>
+          <section class="panel insights-panel">
+            <div class="panel-head"><div><h3>At a glance</h3><p>Evidence-based observations</p></div><span class="small-tag">AUTO GENERATED</span></div>
+            <div id="insights-list"><div class="chart-empty">Calculating...</div></div>
+            <button class="link-button" type="button" data-view="reports">Open report <span>→</span></button>
+          </section>
+        </div>
+        <div class="lower-grid">
+          <section class="panel"><div class="panel-head"><div><h3>Trading volume</h3><p>Daily market participation</p></div><span class="small-tag">SHARES</span></div><div class="chart-wrap short" id="volume-chart"></div></section>
+          <section class="panel"><div class="panel-head"><div><h3>Daily returns</h3><p>Distribution of percentage changes</p></div><span class="small-tag">HISTOGRAM</span></div><div class="chart-wrap short" id="histogram-chart"></div></section>
+        </div>
+      </section>
+      <section class="screen" data-screen="explorer">
+        <div class="page-head"><div><div class="eyebrow"><span class="eyebrow-square"></span> HISTORICAL PRICES</div><h1>Price <em>explorer.</em></h1><p>Inspect price action and download the exact selected slice.</p></div><button type="button" class="btn btn-outline" id="export-csv">↓ Export filtered CSV</button></div>
+        <div class="section-header"><h2>Interactive chart</h2><div class="explorer-controls"><div class="period-tabs" aria-label="Historical date range"><button data-period="1M">1M</button><button data-period="3M">3M</button><button data-period="6M">6M</button><button data-period="1Y" class="active">1Y</button><button data-period="5Y">5Y</button><button data-period="ALL">ALL</button></div><div class="chart-mode" role="group" aria-label="Chart style"><button type="button" data-mode="line" class="active">Line</button><button type="button" data-mode="candles">Candlesticks</button></div></div></div>
+        <section class="panel explorer-chart"><div class="panel-head"><div><h3>NVDA · Historical OHLCV</h3><p id="explorer-subtitle">Daily prices · file-backed</p></div></div><div id="explorer-price-chart" class="chart-wrap tall"></div><div class="chart-foot"><span>Source values as supplied by the CSV</span><span id="explorer-range">—</span></div></section>
+        <section class="panel"><div class="panel-head"><div><h3>Price history</h3><p>Most recent records from selected period</p></div><span class="small-tag" id="table-count">—</span></div><div class="table-scroll"><table><thead><tr><th>Date</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th><th>Daily return</th></tr></thead><tbody id="price-table"></tbody></table></div></section>
+      </section>
+      <section class="screen" data-screen="quality">
+        <div class="page-head"><div><div class="eyebrow"><span class="eyebrow-square"></span> TRUST THE INPUTS</div><h1>Dataset <em>doctor.</em></h1><p>Transparent ingestion diagnostics. Invalid rows are excluded and counted, never silently fabricated.</p></div></div>
+        <div class="quality-stats"><div class="quality-number"><small>ROWS READ</small><strong id="quality-total">—</strong></div><div class="quality-number"><small>ACCEPTED ROWS</small><strong id="quality-valid">—</strong></div><div class="quality-number"><small>VALID RECORD RATE</small><strong id="quality-rate">—</strong></div></div>
+        <section class="panel"><div class="panel-head"><div><h3>Validation summary</h3><p>Issues encountered during the most recent import</p></div><span class="small-tag">DATA LINEAGE</span></div><div class="issue-list" id="issue-list"></div></section>
+        <section class="panel lineage"><div class="panel-head"><div><h3>Dataset provenance</h3><p>Current file and calculation rules</p></div></div><dl id="lineage-list"></dl></section>
+      </section>
+      <section class="screen" data-screen="reports">
+        <div class="page-head"><div><div class="eyebrow"><span class="eyebrow-square"></span> RESEARCH SUMMARY</div><h1>Analysis <em>report.</em></h1><p>A transparent written summary based on historical observations — not a price prediction.</p></div><button type="button" class="btn btn-primary" id="download-report">↓ Export Markdown</button></div>
+        <section class="panel report-panel"><div class="report-head"><span class="small-tag">HISTORICAL ANALYSIS</span><span id="report-asof">—</span></div><h2>NVIDIA Corporation (NVDA)</h2><p class="report-deck">Market behavior and data-quality overview</p><div class="report-statline" id="report-statline"></div><div id="report-observations"></div><div class="report-disclaimer">Research and educational use only. No investment advice, live quotes, future returns, or trading recommendations. Splits and adjustment methodology depend on the source CSV.</div></section>
+        <button type="button" class="btn btn-outline" id="download-json">↓ Export metrics JSON</button>
+      </section>
+      <footer class="footer"><span>NVDA Insights Studio · Made by Nazir Ali Khan</span><span>Local-first analytics · No investment advice · <a href="https://www.kaggle.com/datasets/caesarmario/nvidia-stock-historical-price" target="_blank" rel="noopener noreferrer">Kaggle import source ↗</a></span></footer>
+    </main>
+  </div>
+</div>
+<div class="tooltip hidden" id="chart-tooltip" role="status"></div>
+<script type="module" src="./src/app.js"></script>
+</body>
+</html>
