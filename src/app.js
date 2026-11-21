@@ -105,7 +105,7 @@ function renderTable(rows){
 function renderQuality(){
  const d=state.diagnostics;if(!d)return;
  setText('quality-total',num(d.total));setText('quality-valid',num(d.valid));setText('quality-rate',(100*d.valid/Math.max(1,d.total)).toFixed(2)+'%');
- const labels={badDate:'Invalid dates',badPrice:'Missing / invalid prices',badRange:'Inconsistent OHLC ranges',badVolume:'Invalid trading volumes',duplicates:'Duplicate trading dates',unsorted:'Out-of-order source dates'};
+ const labels={blank:'Blank source rows',badDate:'Invalid dates',badPrice:'Missing / invalid prices',badRange:'Inconsistent OHLC ranges',badVolume:'Invalid trading volumes',duplicates:'Duplicate trading dates',unsorted:'Out-of-order source dates'};
  $('issue-list').innerHTML=Object.entries(labels).map(([k,label])=>'<div class="issue '+(d.issues[k]?'warning':'')+'"><span>'+label+'</span><strong>'+num(d.issues[k]||0)+'</strong></div>').join('');
  const s=summary(state.all);
  const items=[['File',state.filename],['Origin',state.source],['Rows received',num(d.total)],['Valid rows',num(d.valid)],['Date range',s.first+' — '+s.last],['Adjustment basis',s.priceBasis],['Calculations','Volatility: sample SD × √252; return: last / first − 1'],['Privacy','Local browser parsing; no dataset upload']];
