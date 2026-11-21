@@ -12,3 +12,12 @@ jobs:
           node-version: '22'
       - name: Run unit tests
         run: node --test tests/analytics.test.js
+      - name: Verify GitHub Pages static artifact
+        shell: bash
+        run: |
+          mkdir -p dist/src dist/assets dist/data
+          cp index.html dist/
+          cp src/analytics.js src/app.js dist/src/
+          cp assets/styles.css dist/assets/
+          cp data/nvda-history-1999-2024.csv dist/data/
+          node scripts/verify-static-site.mjs dist
