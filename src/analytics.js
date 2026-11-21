@@ -2,7 +2,7 @@
 // All calculations are local. No trades, forecasts, or live market feeds.
 export function parseCSV(text) {
   if (typeof text !== 'string' || !text.trim()) throw new Error('The CSV is empty.');
-  const lines = []; let row = []; let cell = ''; let quoted = false;
+  const lines = []; let row = []; let cell = ''; let quoted = false; let blankRows = 0;
   const input = text.replace(/^\uFEFF/, '');
   for (let i = 0; i < input.length; i++) {
     const ch = input[i];
@@ -12,7 +12,7 @@ export function parseCSV(text) {
     } else if (ch === ',' && !quoted) { row.push(cell); cell = ''; }
     else if ((ch === '\n' || ch === '\r') && !quoted) {
       if (ch === '\r' && input[i + 1] === '\n') i++;
-      row.push(cell); if (row.some(v => String(v).trim())) lines.push(row);
+      row.push(cell); if (row.some(v => String(v).trim())) lines.push(row); else blankRows++;
       row = []; cell = '';
     } else { cell += ch; }
   }
@@ -26,7 +26,7 @@ export function parseCSV(text) {
     throw new Error('Required columns: Date, Open, High, Low, Close and Volume. Adj Close is optional.');
   }
   const adjusted = index('adjclose');
-  const parsed = [], issues = { blank:0, badDate:0, badPrice:0, badRange:0, badVolume:0, duplicates:0, unsorted:0 };
+  const parsed = [], issues = { blank:blankRows, badDate:0, badPrice:0, badRange:0, badVolume:0, duplicates:0, unsorted:0 };
   let previousDate = '';
   for (let n = 1; n < lines.length; n++) {
     const cells = lines[n];
@@ -49,7 +49,7 @@ export function parseCSV(text) {
     if (deduped.length && deduped[deduped.length-1].date === entry.date) { issues.duplicates++; deduped[deduped.length-1] = entry; }
     else deduped.push(entry);
   }
-  return { rows: deduped, diagnostics:{total:lines.length-1,valid:deduped.length,issues}, headers:lines[0].map(v=>v.trim()),hasAdjusted:adjusted>=0 };
+  return { rows: deduped, diagnostics:{total:lines.length-1+blankRows,valid:deduped.length,issues}, headers:lines[0].map(v=>v.trim()),hasAdjusted:adjusted>=0 };
 }
 export function enrichRows(rows) {
   let sum20=0,sum50=0,peak=-Infinity;
