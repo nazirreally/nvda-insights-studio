@@ -1,0 +1,100 @@
+name: Publish NVDA Analytics Demo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "assets/**"
+      - "data/**"
+      - "src/**"
+      - "tests/**"
+      - "scripts/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-deployment"
+  cancel-in-progress: false
+
+jobs:
+  pages-status:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.detect.outputs.enabled }}
+    steps:
+      - id: detect
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mode="$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type' 2>/dev/null || echo disabled)"
+          if [ "$mode" = "workflow" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Pages is not configured for GitHub Actions. Enable it once in Settings > Pages, or run the setup CLI script." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  deploy:
+    needs: pages-status
+    if: needs.pages-status.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test analytics calculations
+        run: node --test tests/*.test.js
+      - name: Build static site without exposing source tests
+        shell: bash
+        run: |
+          mkdir -p dist/src dist/assets dist/data
+          cp index.html dist/
+          cp src/analytics.js src/app.js dist/src/
+          cp assets/styles.css dist/assets/
+          cp data/nvda-history-1999-2024.csv dist/data/
+          touch dist/.nojekyll
+          node scripts/verify-static-site.mjs dist
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Publish GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Verify live HTML, module and historical CSV
+        shell: bash
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${SITE_URL%/}"
+          ready=false
+          for i in {1..12}; do
+            if curl -fsSL --connect-timeout 10 --max-time 25 "$base/" -o /tmp/nvda-index.html \
+               && grep -q 'NVDA Insights Studio' /tmp/nvda-index.html; then
+              ready=true
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" = true
+          curl -fsSL "$base/src/app.js" -o /tmp/nvda-app.js
+          curl -fsSL "$base/src/analytics.js" -o /tmp/nvda-analytics.js
+          curl -fsSL "$base/assets/styles.css" -o /tmp/nvda-styles.css
+          curl -fsSL "$base/data/nvda-history-1999-2024.csv" -o /tmp/nvda-data.csv
+          test -s /tmp/nvda-app.js
+          test -s /tmp/nvda-analytics.js
+          test -s /tmp/nvda-styles.css
+          head -n1 /tmp/nvda-data.csv | grep -q 'Date,Open,High,Low,Close,Volume'
+          echo "Live NVDA demo and required assets returned successfully: $base/" >> "$GITHUB_STEP_SUMMARY"
