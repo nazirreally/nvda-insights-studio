@@ -4,6 +4,14 @@
 
 > The application analyzes historical datasets. It is not a live quote service, stock forecast, or investment-advice platform.
 
+## Online demo (GitHub Pages)
+
+[**Open the static NVDA dashboard**](https://nazirreally.github.io/nvda-insights-studio/) — this address will become available after GitHub Pages is enabled and the **Publish NVDA Analytics Demo** workflow passes. Publishing is not claimed until the live URL is verified.
+
+The [deployment workflow](.github/workflows/deploy-pages.yml) packages the HTML, CSS, JavaScript modules and historical CSV without uploading private CSV imports. It verifies the artifact's relative paths and checks the live HTML and required assets after deploying. GitHub Pages hosts the *static browser dashboard*; no stock-price API or live data feed is included.
+
+To enable once: repository **Settings → Pages → Build and deployment → Source: GitHub Actions**. Then run the **Publish NVDA Analytics Demo** workflow from Actions, or use the activation script supplied with the portfolio audit.
+
 ## Run locally
 
 From the project folder:
@@ -70,6 +78,6 @@ package.json
 
 ### Deployment
 
-The project is ready for static hosting or GitHub Pages once the repository's Pages settings are configured. No hosting/deployment is claimed until the URL is verified.
+Automated deployment is configured in `.github/workflows/deploy-pages.yml`. GitHub Pages must be enabled once with **Source: GitHub Actions**. The deploy job includes HTTP checks for the published HTML, JavaScript modules, stylesheet and bundled CSV; a green deployment run confirms those network checks, not a full cross-browser interaction test.
 
 **Educational use only; not financial advice.**
