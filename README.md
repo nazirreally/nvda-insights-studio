@@ -6,11 +6,11 @@
 
 ## Online demo (GitHub Pages)
 
-[**Open the static NVDA dashboard**](https://nazirreally.github.io/nvda-insights-studio/) — this address will become available after GitHub Pages is enabled and the **Publish NVDA Analytics Demo** workflow passes. Publishing is not claimed until the live URL is verified.
+[**Open the live NVDA analytics dashboard**](https://nazirreally.github.io/nvda-insights-studio/) — deployed on GitHub Pages. The [deployment workflow](https://github.com/nazirreally/nvda-insights-studio/actions/runs/44947709320) passed its live HTTP checks for the HTML, JavaScript modules, stylesheet, and historical CSV.
 
 The [deployment workflow](.github/workflows/deploy-pages.yml) packages the HTML, CSS, JavaScript modules and historical CSV without uploading private CSV imports. It verifies the artifact's relative paths and checks the live HTML and required assets after deploying. GitHub Pages hosts the *static browser dashboard*; no stock-price API or live data feed is included.
 
-To enable once: repository **Settings → Pages → Build and deployment → Source: GitHub Actions**. Then run the **Publish NVDA Analytics Demo** workflow from Actions, or use the activation script supplied with the portfolio audit.
+**Deployment updates:** Push changes to the site source or dispatch **Publish NVDA Analytics Demo** from the repository Actions tab. GitHub Pages is configured with Source: GitHub Actions.
 
 ## Run locally
 
@@ -78,6 +78,6 @@ package.json
 
 ### Deployment
 
-Automated deployment is configured in `.github/workflows/deploy-pages.yml`. GitHub Pages must be enabled once with **Source: GitHub Actions**. The deploy job includes HTTP checks for the published HTML, JavaScript modules, stylesheet and bundled CSV; a green deployment run confirms those network checks, not a full cross-browser interaction test.
+Automated deployment is configured in `.github/workflows/deploy-pages.yml`. GitHub Pages is enabled with **Source: GitHub Actions**. The deploy job includes HTTP checks for the published HTML, JavaScript modules, stylesheet and bundled CSV; a green deployment run confirms those network checks, not a full cross-browser interaction test.
 
 **Educational use only; not financial advice.**
