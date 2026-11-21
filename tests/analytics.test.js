@@ -28,3 +28,11 @@ test('nonpositive or inconsistent OHLC and volume are rejected',()=>{
  const x=parseCSV(input+'2024-01-05,0,1,1,1,10\n2024-01-06,10,9,8,11,10\n2024-01-07,10,11,9,10,-5\n');
  assert.equal(x.rows.length,3);assert.equal(x.diagnostics.issues.badPrice,1);assert.equal(x.diagnostics.issues.badRange,1);assert.equal(x.diagnostics.issues.badVolume,1);
 });
+
+test('counts blank source rows in data-quality diagnostics',()=>{
+ const parsed=parseCSV(input+'\n\n');
+ assert.equal(parsed.rows.length,3);
+ assert.equal(parsed.diagnostics.total,5);
+ assert.equal(parsed.diagnostics.valid,3);
+ assert.equal(parsed.diagnostics.issues.blank,2);
+});
